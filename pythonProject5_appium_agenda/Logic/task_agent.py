@@ -1,46 +1,36 @@
 from selenium.webdriver.support.wait import WebDriverWait
 from appium.webdriver.common.appiumby import AppiumBy
 
-class takeAhent():
-    def __init__(self,driver):
-         self.driver=driver
 
-        #
+class Agenda:
+    def __init__(self):
+        self.events = []
 
-    def init_final_result(self):
-         self.result_button=self.driver.find_element(by=AppiumBy.ID, value=self.RESULT)
+    def add_event(self, title, description, date):
+        event = {"title": title, "description": description, "date": date}
+        self.events.append(event)
 
+    def delete_event(self, title):
+        for event in self.events:
+            if event["title"] == title:
+                self.events.remove(event)
 
-    def add_function(self,num_one,num_two):
-        self.click_on_number(num_one)
-        self.add_button.click()
-        self.click_on_number(num_two)
-        self.equal_button.click()
-        self.init_final_result()
-        return self.result_button.text
+    def edit_event(self, title, new_title, new_description, new_date):
+        for event in self.events:
+            if event["title"] == title:
+                event["title"] = new_title
+                event["description"] = new_description
+                event["date"] = new_date
 
-    def substract_function(self,num_one,num_two):
-        self.click_on_number(num_one)
-        self.subtract_button.click()
-        self.click_on_number(num_two)
-        self.equal_button.click()
-        self.init_final_result()
-        return self.result_button.text
-    def click_on_number(self,number):
-        self._driver.find_element(by=AppiumBy.ID, value=f'com.google.android.calculator:id/digit_{number}').click()
-    def multiply_function(self,num_one,num_two):
-        self.click_on_number(num_one)
-        self.mult_button.click()
-        self.click_on_number(num_two)
-        self.equal_button.click()
-        self.init_final_result()
-        return self.result_button.text
+    def get_event_details(self, title):
+        for event in self.events:
+            if event["title"] == title:
+                return event
 
+    def search_event(self, query):
+        results = []
+        for event in self.events:
+            if query.lower() in event["title"].lower() or query.lower() in event["description"].lower():
+                results.append(event)
+        return results
 
-    def divid_function(self,num_one,num_two):
-        self.click_on_number(num_one)
-        self.div_button.click()
-        self.click_on_number(num_two)
-        self.equal_button.click()
-        self.init_final_result()
-        return self.result_button.text
