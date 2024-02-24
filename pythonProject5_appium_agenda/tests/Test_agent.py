@@ -1,59 +1,38 @@
 import unittest
-from time import sleep
-
-from appium.webdriver import webdriver
-
-from infra.browser_wrapper import BrowserWrapper
+from Logic.task_agent import Agenda
 
 
-class TestAgent(unittest.TestCase):
+class TestAgenda(unittest.TestCase):
+
     def setUp(self):
-        desired_caps = dict(
-            platformName="Android",
-            deviceName="emulator-5554",
-            platformVersion="11.0",
-            automationName="UiAutomator2",
-            appPackage="com.claudivan.taskagenda",
-            appActivity=".Activities.MainActivity t36"
-        )
-        self.browser = BrowserWrapper()
-        self.driver = self.browser.get_driver()
-        sleep(5)  # Allow time for the app to launch
+        self.agenda = Agenda()
 
-    def test_create_event(self):
-        self.driver.find_element_by_id("button_add_event").click()
-        self.driver.find_element_by_id("editText_event_title").send_keys("Meeting")
-        self.driver.find_element_by_id("editText_event_description").send_keys("Discuss project")
-        self.driver.find_element_by_id("button_save_event").click()
+    def test_add_event(self):
+        self.agenda.add_event("Meeting", "Discuss project", "2024-02-25")
+        self.assertEqual(len(self.agenda.events), 1)
+        self.assertEqual(self.agenda.events[0]["title"], "Meeting")
 
     def test_delete_event(self):
-        # Test deleting an existing event
-        # Assuming there's a list of events and each event has a delete button with id "button_delete_event"
-        # Assuming there's an event named "Meeting" that we want to delete
-        self.driver.find_element_by_android_uiautomator(
-            'new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text("Meeting"))')
-        self.driver.find_element_by_android_uiautomator('new UiSelector().text("Meeting")').click()
-        self.driver.find_element_by_id("button_delete_event").click()
-        # Add assertions to verify event deletion, for example:
-        # assert "Meeting" not in self.driver.page_source
+        self.agenda.add_event("Meeting", "Discuss project", "2024-02-25")
+        self.agenda.delete_event("Meeting")
+        self.assertEqual(len(self.agenda.events), 0)
 
     def test_edit_event(self):
-        self.driver.find_element_by_android_uiautomator(
-            'new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text("Meeting"))')
-        self.driver.find_element_by_android_uiautomator('new UiSelector().text("Meeting")').click()
-        self.driver.find_element_by_id("editText_event_title").clear()
-        self.driver.find_element_by_id("editText_event_title").send_keys("Updated Meeting")
-        self.driver.find_element_by_id("button_save_event").click()
+        self.agenda.add_event("Meeting", "Discuss project", "2024-02-25")
+        self.agenda.edit_event("Meeting", "Updated Meeting", "Discuss project updated", "2024-02-26")
+        event = self.agenda.get_event_details("Updated Meeting")
+        self.assertEqual(event["description"], "Discuss project updated")
+        self.assertEqual(event["date"], "2024-02-26")
 
-    def test_view_event_details(self):
-        self.driver.find_element_by_android_uiautomator(
-            'new UiScrollable(new UiSelector().scrollable(true)).scrollIntoView(new UiSelector().text("Meeting"))')
-        self.driver.find_element_by_android_uiautomator('new UiSelector().text("Meeting")').click()
+    def test_get_event_details(self):
+        self.agenda.add_event("Meeting", "Discuss project", "2024-02-25")
+        event = self.agenda.get_event_details("Meeting")
+        self.assertEqual(event["description"], "Discuss project")
+        self.assertEqual(event["date"], "2024-02-25")
 
     def test_search_event(self):
-        self.driver.find_element_by_id("search_event").send_keys("Meeting")
-        # Assuming there's a search button with id "button_search"
-        self.driver.find_element_by_id("button_search").click()
-
-    def tearDown(self):
-        self.driver.quit()
+        self.agenda.add_event("Meeting", "Discuss project", "2024-02-25")
+        self.agenda.add_event("Interview", "Job interview", "2024-02-26")
+        results = self.agenda.search_event("Discuss")
+        self.assertEqual(len(results), 1)
+        self.assertEqual(results[0]["title"], "Meeting")
