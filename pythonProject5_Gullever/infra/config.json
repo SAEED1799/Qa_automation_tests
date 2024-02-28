@@ -1,0 +1,8 @@
+{
+  "HAB_URL": "http://localhost:4444/wd/hub",
+  "user_name": "Saeed",
+  "url" : "https://www.gulliver.co.il/",
+  "grid": false,
+  "serial" : false,
+  "browser_name": "chrome"
+}
