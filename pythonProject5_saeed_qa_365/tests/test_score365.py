@@ -6,6 +6,7 @@ from logic.website_interactions import WebsiteInteractions
 class TestScore365(unittest.TestCase):
     def setUp(self):
         self.driver = webdriver.Chrome()
+        self.browser = BrowserWrapper()
         self.driver.maximize_window()
 
     def test_homepage_title(self):
