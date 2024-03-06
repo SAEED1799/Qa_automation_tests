@@ -4,7 +4,10 @@ from Logic.task_agent import Agenda
 
 class TestAgenda(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
+        self.wrapper = BrowserWrapper()
+        self.driver = self.wrapper.get_driver()
+        self.week_page = weekPage(self.driver)
         self.agenda = Agenda()
 
     def test_add_event(self):
